@@ -4,4 +4,5 @@ export class Product{
     description: string;
     image: string;
     price: string;
+    product: string;
 }
