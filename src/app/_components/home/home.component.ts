@@ -7,9 +7,9 @@ import { AccountService } from 'src/app/_services/account/account.service';
   templateUrl: './home.component.html',
 })
 export class HomeComponent implements OnInit {
-  user: User
+  user: User | null;
   constructor(private accountService:AccountService) {
-    this.user = this.accountService.userValue;
+    this.user = this.accountService.userValue || null;
    }
 
   ngOnInit(): void {

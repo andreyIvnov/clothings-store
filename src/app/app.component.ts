@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { User } from './_interfaces/user';
-import { AccountService } from './_services/account/account.service';
+import {Component} from '@angular/core';
+import {User} from './_interfaces/user';
+import {AccountService} from './_services/account/account.service';
 
 @Component({
   selector: 'app-root',
@@ -8,16 +8,20 @@ import { AccountService } from './_services/account/account.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  user: User
-  title = 'Shoes Market';
-  constructor(private accountService: AccountService)
-  {
-    this.accountService.user.subscribe(x => this.user = x)
-    // this.accountService.logout();
+  user: User | {}
+
+  constructor(private accountService: AccountService) {
+    if (!this.user && localStorage.getItem('current-user'))
+      this.accountService.user.subscribe(currentUser => {
+        if (currentUser && Object.keys(currentUser).length !== 0)
+          this.user = currentUser;
+  /*      else {
+          this.accountService.logout();
+        }*/
+      })
   }
 
   logout() {
-    
     this.accountService.logout();
   }
 }

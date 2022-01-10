@@ -1,1 +1,54 @@
-<p>add-edit works!</p>
+<a routerLink="/products/products-list" class="btn btn-sm btn-success mb-2">Back</a>
+
+<form [formGroup]="myForm" (ngSubmit)="submit()">
+
+  <div class="form-group">
+    <label for="title">Title</label>
+    <input
+      formControlName="title"
+      id="title"
+      type="text"
+      class="form-control">
+    <div *ngIf="f.title.touched && f.title.invalid" class="alert alert-danger">
+      <div *ngIf="f.title.errors?.required">Title is required.</div>
+      <div *ngIf="f.title.errors?.minlength">Title should be 3 character.</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description</label>
+    <input
+      formControlName="description"
+      id="description"
+      type="text"
+      class="form-control">
+  </div>
+
+  <div class="form-group">
+    <label for="description">Price</label>
+    <input
+      formControlName="price"
+      id="price"
+      type="text"
+      class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="file">File</label>
+    <input
+      formControlName="file"
+      id="file"
+      type="file"
+      class="form-control"
+      multiple=""
+      (change)="onFileChange($event)">
+    <div *ngIf="f.file.touched && f.file.invalid" class="alert alert-danger">
+      <div *ngIf="f.file.errors?.required">File is required.</div>
+    </div>
+  </div>
+
+  <img *ngFor='let url of images'  [src]="url" height="150" width="200px" style="margin: 3px;"> <br/>
+
+  <button class="btn btn-primary" type="submit">Submit</button>
+  <button class="btn btn-primary" type="submit" (click)="clear()">Clear</button>
+
+</form>

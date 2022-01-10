@@ -8,11 +8,10 @@ import { AlertService } from 'src/app/_services/alert/alert.service';
 })
 export class RegisterComponent implements OnInit {
   form: FormGroup;
-  loading = false;
 
   constructor(
     private formBuilder: FormBuilder,
-    private accountService: AccountService,
+    public accountService: AccountService,
     private alertService: AlertService
   ) { }
 
@@ -21,7 +20,7 @@ export class RegisterComponent implements OnInit {
       firstName:['',Validators.required],
       lastName:['',Validators.required],
       username:['',Validators.required],
-      password:['',[Validators.required, 
+      password:['',[Validators.required,
       Validators.minLength(4)]]
     })
   }
@@ -34,7 +33,7 @@ export class RegisterComponent implements OnInit {
 
     if(this.form.invalid){return;}
 
-    this.loading = true;
+    this.accountService.loading = true;
     this.accountService.register(this.form.getRawValue())
 
   }

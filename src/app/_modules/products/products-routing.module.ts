@@ -5,13 +5,13 @@ import { AddEditComponent } from './_components/add-edit/add-edit.component';
 import { ListComponent } from './_components/list/list.component';
 
 const routes: Routes = [
-  { path: '', 
+  { path: '',
     component: LayoutComponent,
     children: [
-      {path:'list',component:ListComponent},
-      {path:'add',component:AddEditComponent},
+      {path:'products-list',component:ListComponent},
+      {path:'add-product',component:AddEditComponent},
       {path:'edit/:id',component:AddEditComponent}
-    ]  
+    ]
   }
 ];
 

@@ -22,7 +22,6 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // debugger
     this.form = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
@@ -33,7 +32,6 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     //reset alerts on submit
-    // debugger
     this.alertService.clear();
     // if form is invaled is stopped hear
     if (this.form.invalid) {
@@ -42,12 +40,11 @@ export class LoginComponent implements OnInit {
     this.loading = true;
     if(!this.accountService.login(this.form.getRawValue())){
       const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-      this.router.navigateByUrl(returnUrl);  
-      // debugger
+      this.router.navigateByUrl(returnUrl);
     }
-    
+
     this.loading = false;
-    
+
 
   }
 }

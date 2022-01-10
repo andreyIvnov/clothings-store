@@ -1,14 +1,13 @@
-<h1>Cheaker</h1>
-
 <!-- Can see it only after user logid -->
 
 <!-- HEADER -->
-<div *ngIf="user">
-  <nav class="navbar navbar-expand navbar-dark bg-dark" >
+<div>
+  <nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="user">
+    <a class="nav-item nav-link" routerLink="/home" routerLinkActive="active"
+       [routerLinkActiveOptions]="{exact: true}"><img style="width: 40px;" src="assets/logo.png"/></a>
+
     <div class="navbar-nav">
-      <a class="nav-item nav-link" routerLink="/" routerLinkActive="active"
-        [routerLinkActiveOptions]="{exact: true}">Home</a>
-      <a class="nav-item nav-link" routerLink="/products" routerLinkActive="active">Products</a>
+        <a class="nav-item nav-link" routerLink="/products/products-list">Products</a>
       <a class="nav-item nav-link" (click)="logout()">Logout</a>
     </div>
   </nav>
@@ -36,7 +35,7 @@
 </div>
 
   <div class="content-container">
-    
+
     <div class="container-fluid">
 
       <div class="jumbotron">
@@ -45,8 +44,8 @@
           <alert></alert>
           <router-outlet></router-outlet>
         </div>
-      </div>  
-      
+      </div>
+
     </div>
   </div>
 </div>

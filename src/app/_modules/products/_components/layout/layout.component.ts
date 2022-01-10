@@ -1,4 +1,8 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
-@Component({  templateUrl: './layout.component.html'})
-export class LayoutComponent {}
+@Component({selector: 'app-layout', templateUrl: './layout.component.html'})
+export class LayoutComponent {
+
+  constructor() {}
+
+}

@@ -17,6 +17,7 @@ import { HomeComponent } from './_components/home/home.component';
 import { AlertComponent } from './_components/alert/alert.component';
 import { JwtInterceptor } from './_helpers/jwt.interceptor';
 import { ErrorInterceptor } from './_helpers/error.interceptor';
+import {RouterModule} from "@angular/router";
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import { ErrorInterceptor } from './_helpers/error.interceptor';
   ],
   imports: [
     BrowserModule,
+    RouterModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
@@ -42,11 +44,11 @@ import { ErrorInterceptor } from './_helpers/error.interceptor';
   [
     {provide: HTTP_INTERCEPTORS, useClass:JwtInterceptor,multi:true},
     { provide: HTTP_INTERCEPTORS, useClass:ErrorInterceptor, multi: true },
-    
+
     fakeBackendProvider
   ],
-  
-  bootstrap: 
+
+  bootstrap:
   [AppComponent]
 })
 export class AppModule { }

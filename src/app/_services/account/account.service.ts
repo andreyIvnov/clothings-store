@@ -12,22 +12,22 @@ import { User } from 'src/app/_interfaces/user';
 export class AccountService {
   private userSubject:BehaviorSubject<User>;
   public user:Observable<User>
+  loading = false;
 
   constructor
-  (private router: Router, private http: HttpClient) 
-  { 
-    // debugger
+  (private router: Router, private http: HttpClient)
+  {
     this.userSubject = new BehaviorSubject<User>
     (
-      JSON.parse(localStorage.getItem('registred-users') || '{}')
+      JSON.parse(localStorage.getItem('current-user') || '{}')
     );
 
     this.user = this.userSubject.asObservable();
   }
 
-  public get userValue():User
+  public get userValue():User | null
   {
-    return this.userSubject.value;
+    return localStorage.getItem('current-user') ? this.userSubject.value : null;
   }
 
   login(form:any)
@@ -36,15 +36,8 @@ export class AccountService {
       `${environment.apiUrl}/users/authenticate`,
       {username:form.username, password:form.password})
         .subscribe(
-          // user => {
-          // debugger
-          // localStorage.setItem('user', 
-          // JSON.stringify(user));
-          // this.userSubject.next(user);
-          // return user;
           user => {
-            // localStorage.setItem('user',  //store user details and token in localstorage
-            // JSON.stringify(user));
+            localStorage.setItem('current-user', JSON.stringify(user));
             this.userSubject.next(user);
           if(user){
             this.router.navigateByUrl('/home')
@@ -52,22 +45,24 @@ export class AccountService {
           return user;
           },
           error => {
-            debugger
            alert(error.error.message)
         })
   }
 
   logout()    //remove user from localStorage
   {
-    localStorage.removeItem('user');
-    this.userSubject.next(null as any);
+    localStorage.removeItem('current-user');
+    this.userSubject.next({} as any);
     this.router.navigate(['account/login']);
   }
 
   register(user: User)
   {
     return this.http.post(`${environment.apiUrl}/users/register`, user)
-    .subscribe(user => {})
+    .subscribe(user => {
+      this.loading = false;
+      this.router.navigate(['home'])
+    })
 
   }
 
@@ -84,9 +79,9 @@ export class AccountService {
   update(id: string, params: any)
   {
     return this.http.put(`${environment.apiUrl}/users/${id}`,params)
-      .pipe(map(x => 
+      .pipe(map(x =>
         {
-          if(id == this.userValue.id)
+          if(id == this.userValue?.id)
           { // update local storage
             const user = { ...this.userValue, ...params};
             localStorage.setItem('user', JSON.stringify(user));
@@ -101,8 +96,8 @@ export class AccountService {
   {
     return this.http.delete(`${environment.apiUrl}/users/${id}`)
       .pipe(map(x =>
-        {  // automatic logout if user try entryce to deleted user 
-          if(id == this.userValue.id)
+        {  // automatic logout if user try entryce to deleted user
+          if(id == this.userValue?.id)
           { this.logout();}
           return x;
         }))

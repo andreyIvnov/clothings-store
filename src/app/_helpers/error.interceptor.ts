@@ -15,7 +15,6 @@ export class ErrorInterceptor implements HttpInterceptor {
                 // auto logout if 401 or 403 response returned from api
                 this.accountService.logout();
             }
-            debugger        
             const error = err.error?.message || err.statusText;
             console.error(err);
             return throwError(err);

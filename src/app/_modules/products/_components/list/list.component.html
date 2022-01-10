@@ -1,4 +1,12 @@
-<h1>Products</h1>
+<a (click)="addNew()" class="btn btn-sm btn-success mb-2">Add Product</a>
+<div *ngIf="products && products.length > 0">
+  <div *ngFor="let product of products" style="display: flex">
+    <ul style="font-size: x-large">{{product?.title}}</ul>
+    <ul>Price: {{product?.price}}</ul>
+    <ul>Description: {{product?.description}}</ul>
+    <ul><img [src]="product?.fileSource[0]" height="150" width="200px" style="margin: 3px;">  </ul>
+  </div>
+</div>
 <!-- <a routerLink="add" class="btn btn-sm btn-success mb-2">Add Product</a>
 <table class="table table-striped">
     <thead>
