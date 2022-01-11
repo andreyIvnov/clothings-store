@@ -9,10 +9,10 @@ const routes: Routes = [
     component: LayoutComponent,
     children: [
       {path:'products-list',component:ListComponent},
-      {path:'add-product',component:AddEditComponent},
-      {path:'edit/:id',component:AddEditComponent}
+      {path:'add-product',component:AddEditComponent}
     ]
-  }
+  },
+  {path:'edit/:id',component:AddEditComponent}
 ];
 
 @NgModule({

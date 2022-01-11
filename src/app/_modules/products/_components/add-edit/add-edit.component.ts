@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpClient} from "@angular/common/http";
 import {ProductService} from "../../../../_services/product/product.service";
+import {ActivatedRoute, ParamMap} from "@angular/router";
 
 @Component({
   selector: 'app-add-edit',
@@ -9,15 +10,28 @@ import {ProductService} from "../../../../_services/product/product.service";
   styleUrls: ['./add-edit.component.css']
 })
 export class AddEditComponent implements OnInit {
-
-  constructor(private productService: ProductService) {
+ productId: string;
+  constructor(private productService: ProductService, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
+    this.route.paramMap
+      .subscribe((map:ParamMap) => {
+        this.productId = map.get('id') as string;
+        this.productService.getById(Number(this.productId)).subscribe((result:any) =>{
+          this.images = result.fileSource;
+          this.myForm.patchValue(result);
+        });
+        }
+      );
+
   }
 
   images = [];
   myForm = new FormGroup({
+    customerId:new FormControl(''),
+    userId:new FormControl(JSON.parse(localStorage.getItem('current-user') || '')?.id || null),
+    id: new FormControl(''),
     title: new FormControl('', [Validators.required, Validators.minLength(3)]),
     description: new FormControl('', [Validators.required, Validators.minLength(3)]),
     price: new FormControl('', [Validators.required, Validators.minLength(3)]),

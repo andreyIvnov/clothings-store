@@ -8,7 +8,7 @@ import {AccountService} from './_services/account/account.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  user: User | {}
+  user: User
 
   constructor(private accountService: AccountService) {
     if (!this.user && localStorage.getItem('current-user'))

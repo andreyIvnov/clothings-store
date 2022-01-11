@@ -27,7 +27,7 @@ export class ProductService {
     return this.http.get<Product>(`${environment.apiUrl}/products`);
   }
 
-  getById(id: string) {
+  getById(id: number) {
     return this.http.get<Product>(`${environment.apiUrl}/products/${id}`);
   }
 
@@ -39,5 +39,9 @@ export class ProductService {
     return this.http.post(`${environment.apiUrl}/products`, product).subscribe(() => {
       this.router.navigate(['products/products-list'])
     });
+  }
+
+  changeProductCart(id: number, userId: number, isAdd:boolean) {
+    return this.http.put<Product[]>(`${environment.apiUrl}/products`, {productId: id, userId:userId, isAdd:isAdd});
   }
 }

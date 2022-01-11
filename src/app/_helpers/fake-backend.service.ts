@@ -37,8 +37,14 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         //products
         case url.endsWith('/products') && method === 'GET':
           return getProductsList();
+        case  url.match(/\/products\/\d+$/) && method === 'GET':
+          return getProductById();
         case url.endsWith('/products') && method === 'POST':
           return addNewProduct();
+        case url.match(/\/products\/\d+$/) && method === 'DELETE':
+          return deleteProduct();
+        case url.match('/products') && method === 'PUT':
+          return updateProducts();
         case url.match(/\/users\/\d+$/) && method === 'GET':
           return getUserById();
         case url.match(/\/users\/\d+$/) && method === 'PUT':
@@ -58,7 +64,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       const user = users.find((x: any) => x.username === username && x.password === password);
       if (!user) return error('Username or password is incorrect');
       return ok({
-        ...basicDetails(user),
+        ...basicDetailsAccount(user),
         token: 'fake-jwt-token'
       })
     }
@@ -78,14 +84,14 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
     function getUsers() {
       if (!isLoggedIn()) return unauthorized();
-      return ok(users.map((x: any) => basicDetails(x)));
+      return ok(users.map((x: any) => basicDetailsAccount(x)));
     }
 
     function getUserById() {
       if (!isLoggedIn()) return unauthorized();
 
       const user = users.find((x: any) => x.id === idFromUrl());
-      return ok(basicDetails(user));
+      return ok(basicDetailsAccount(user));
     }
 
     function updateUser() {
@@ -119,20 +125,57 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       if (!isLoggedIn()) return unauthorized();
       return ok(products.map((x: any) => basicDetailsProducts(x)));
     }
+
+    function getProductById() {
+      if (!isLoggedIn()) return unauthorized();
+
+      const product = products.find((x: any) => x.id === idFromUrl());
+      return ok(basicDetailsProducts(product));
+    }
+
     function addNewProduct() {
       const product = body
       //not sold
       product.isSale = false;
 //TODO add check validate
 
-/*      if (products.find((x: any) => x.username === user.username)) {
-        return error('Username "' + user.username + '" is already taken')
-      }*/
-
-      product.id = products.length ? Math.max(...products.map((x: any) => x.id)) + 1 : 1;
-      products.push(product);
+      /*      if (products.find((x: any) => x.username === user.username)) {
+              return error('Username "' + user.username + '" is already taken')
+            }*/
+      if (product.id) {
+        var foundIndex = products.findIndex(x => x.id == product.id);
+        products[foundIndex] = product;
+      } else {
+        product.id = products.length ? Math.max(...products.map((x: any) => x.id)) + 1 : 1;
+        products.push(product);
+      }
       localStorage.setItem(productsKey, JSON.stringify(products));
       return ok({});
+    }
+
+    function deleteProduct() {
+      if (!isLoggedIn()) return unauthorized();
+
+      products = products.filter((x: any) => x.id !== idFromUrl());
+      localStorage.setItem(productsKey, JSON.stringify(products));
+      return ok({});
+    }
+
+    function updateProducts() {
+      if (!isLoggedIn()) return unauthorized();
+
+      let params = body;
+
+      let product = products.find((x: any) => x.id === params.productId);
+      var foundIndex = products.findIndex(x => x.id == product.id);
+      if (params.isAdd) {
+        products[foundIndex].customerId = params.userId;
+      } else {
+        products[foundIndex].customerId = undefined;
+      }
+      localStorage.setItem(productsKey, JSON.stringify(products));
+
+      return ok(products);
     }
 
     // helper functions
@@ -152,7 +195,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         .pipe(materialize(), delay(500), dematerialize());
     }
 
-    function basicDetails(user: any) {
+    function basicDetailsAccount(user: any) {
       const {id, username, firstName, lastName} = user;
       return {id, username, firstName, lastName};
     }

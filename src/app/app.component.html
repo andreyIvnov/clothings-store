@@ -7,13 +7,14 @@
        [routerLinkActiveOptions]="{exact: true}"><img style="width: 40px;" src="assets/logo.png"/></a>
 
     <div class="navbar-nav">
+        <h2 style="color: aqua">Hi {{user?.firstName}} {{user?.lastName}}</h2>
         <a class="nav-item nav-link" routerLink="/products/products-list">Products</a>
       <a class="nav-item nav-link" (click)="logout()">Logout</a>
     </div>
   </nav>
 
   <!-- SIDEBAR -->
-<div *ngIf="user" class="sidebar-container">
+<!--<div *ngIf="user" class="sidebar-container">
 
   <ul class="sidebar-navigation">
     <li>
@@ -32,7 +33,7 @@
       </a>
     </li>
   </ul>
-</div>
+</div>-->
 
   <div class="content-container">
 
