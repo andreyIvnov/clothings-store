@@ -18,6 +18,7 @@ import { AlertComponent } from './_components/alert/alert.component';
 import { JwtInterceptor } from './_helpers/jwt.interceptor';
 import { ErrorInterceptor } from './_helpers/error.interceptor';
 import {RouterModule} from "@angular/router";
+import { HeaderComponent } from './_components/header/header.component';
 
 
 @NgModule({
@@ -25,6 +26,7 @@ import {RouterModule} from "@angular/router";
     AppComponent,
     HomeComponent,
     AlertComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,
@@ -41,14 +43,13 @@ import {RouterModule} from "@angular/router";
     MatIconModule
   ],
   providers:
-  [
-    {provide: HTTP_INTERCEPTORS, useClass:JwtInterceptor,multi:true},
-    { provide: HTTP_INTERCEPTORS, useClass:ErrorInterceptor, multi: true },
+    [
+      {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
+      {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
 
-    fakeBackendProvider
-  ],
-
+      fakeBackendProvider
+    ],
   bootstrap:
-  [AppComponent]
+    [AppComponent]
 })
 export class AppModule { }

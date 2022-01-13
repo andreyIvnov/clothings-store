@@ -11,11 +11,11 @@ import {Observable, of, throwError} from 'rxjs';
 import {delay, mergeMap, materialize, dematerialize} from 'rxjs/operators';
 
 // array in local storage for registered users
-const usersKey = 'registred-users';
-const productsKey = 'products-list';
-let users: any[] = localStorage.getItem(usersKey) ? JSON.parse(localStorage.getItem(usersKey) || '') : [];
-let products: any[] = localStorage.getItem(productsKey) ? JSON.parse(localStorage.getItem(productsKey) || '') : [];
-
+const USERS_KAY = 'registred-users';
+const PRODUCTS_KAY = 'products-list';
+let users: any[] = localStorage.getItem(USERS_KAY) ? JSON.parse(localStorage.getItem(USERS_KAY) || '') : [];
+let products: any[] = localStorage.getItem(PRODUCTS_KAY) ? JSON.parse(localStorage.getItem(PRODUCTS_KAY) || '') : [];
+const ERROR_MESSAGE_NOT_HAVE_CASH = "ERROR_MESSAGE_NOT_HAVE_CASH";
 @Injectable()
 export class FakeBackendInterceptor implements HttpInterceptor {
   constructor() {
@@ -40,7 +40,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         case  url.match(/\/products\/\d+$/) && method === 'GET':
           return getProductById();
         case url.endsWith('/products') && method === 'POST':
-          return addNewProduct();
+          return addOrEditProduct();
         case url.match(/\/products\/\d+$/) && method === 'DELETE':
           return deleteProduct();
         case url.match('/products') && method === 'PUT':
@@ -77,8 +77,10 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       }
 
       user.id = users.length ? Math.max(...users.map((x: any) => x.id)) + 1 : 1;
+      // basic cash
+      user.cash = 1000;
       users.push(user);
-      localStorage.setItem(usersKey, JSON.stringify(users));
+      localStorage.setItem(USERS_KAY, JSON.stringify(users));
       return ok({});
     }
 
@@ -107,7 +109,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
       // update and save user
       Object.assign(user, params);
-      localStorage.setItem(usersKey, JSON.stringify(users));
+      localStorage.setItem(USERS_KAY, JSON.stringify(users));
 
       return ok({});
     }
@@ -116,7 +118,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       if (!isLoggedIn()) return unauthorized();
 
       users = users.filter((x: any) => x.id !== idFromUrl());
-      localStorage.setItem(usersKey, JSON.stringify(users));
+      localStorage.setItem(USERS_KAY, JSON.stringify(users));
       return ok({});
     }
 
@@ -133,10 +135,9 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       return ok(basicDetailsProducts(product));
     }
 
-    function addNewProduct() {
+    function addOrEditProduct() {
       const product = body
       //not sold
-      product.isSale = false;
 //TODO add check validate
 
       /*      if (products.find((x: any) => x.username === user.username)) {
@@ -147,9 +148,10 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         products[foundIndex] = product;
       } else {
         product.id = products.length ? Math.max(...products.map((x: any) => x.id)) + 1 : 1;
+        product.isSale = false;
         products.push(product);
       }
-      localStorage.setItem(productsKey, JSON.stringify(products));
+      localStorage.setItem(PRODUCTS_KAY, JSON.stringify(products));
       return ok({});
     }
 
@@ -157,25 +159,38 @@ export class FakeBackendInterceptor implements HttpInterceptor {
       if (!isLoggedIn()) return unauthorized();
 
       products = products.filter((x: any) => x.id !== idFromUrl());
-      localStorage.setItem(productsKey, JSON.stringify(products));
+      localStorage.setItem(PRODUCTS_KAY, JSON.stringify(products));
       return ok({});
     }
 
     function updateProducts() {
       if (!isLoggedIn()) return unauthorized();
-
+      let errorMessage = false;
       let params = body;
+      let user = null;
 
       let product = products.find((x: any) => x.id === params.productId);
-      var foundIndex = products.findIndex(x => x.id == product.id);
-      if (params.isAdd) {
-        products[foundIndex].customerId = params.userId;
-      } else {
-        products[foundIndex].customerId = undefined;
-      }
-      localStorage.setItem(productsKey, JSON.stringify(products));
+      let foundIndexProduct = products.findIndex(x => x.id == product.id);
+      let foundIndexUser = users.findIndex(x => x.id == params.userId);
 
-      return ok(products);
+      if (params.isAdd) {
+        if (users[foundIndexUser].cash >= product.price) {
+          products[foundIndexProduct].customerId = params.userId;
+          products[foundIndexProduct].isSale = true;
+          users[foundIndexUser].cash = users[foundIndexUser].cash - product.price;
+        } else  {
+          errorMessage = true;
+        }
+      } else {
+        products[foundIndexProduct].customerId = undefined;
+        products[foundIndexProduct].isSale = false;
+        users[foundIndexUser].cash = users[foundIndexUser].cash + product.price;
+      }
+      user = users[foundIndexUser];
+
+      localStorage.setItem(PRODUCTS_KAY, JSON.stringify(products));
+
+      return ok({products:products, user:user, error:errorMessage ? ERROR_MESSAGE_NOT_HAVE_CASH : null});
     }
 
     // helper functions
@@ -196,13 +211,13 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     }
 
     function basicDetailsAccount(user: any) {
-      const {id, username, firstName, lastName} = user;
-      return {id, username, firstName, lastName};
+      const {id, username, firstName, lastName, cash} = user;
+      return {id, username, firstName, lastName, cash};
     }
 
     function basicDetailsProducts(product: any) {
-      const {id, title, description, image, price, userId, customerId, isSale, fileSource} = product;
-      return {id, title, description, image, price, userId, customerId, isSale, fileSource};
+      const {id, title, description, image, price, userId, userName, customerId, isSale, fileSource} = product;
+      return {id, title, description, image, price, userId, userName, customerId, isSale, fileSource};
     }
 
     function isLoggedIn() {

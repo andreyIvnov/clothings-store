@@ -35,13 +35,13 @@ export class ProductService {
     return this.http.delete(`${environment.apiUrl}/products/${id}`);
   }
 
-  addNewProduct(product: any) {
+  addOrEditProduct(product: any) {
     return this.http.post(`${environment.apiUrl}/products`, product).subscribe(() => {
-      this.router.navigate(['products/products-list'])
+      this.router.navigate(['products/products-product-list'])
     });
   }
 
   changeProductCart(id: number, userId: number, isAdd:boolean) {
-    return this.http.put<Product[]>(`${environment.apiUrl}/products`, {productId: id, userId:userId, isAdd:isAdd});
+    return this.http.put<any>(`${environment.apiUrl}/products`, {productId: id, userId:userId, isAdd:isAdd});
   }
 }

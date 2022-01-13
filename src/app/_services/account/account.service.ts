@@ -14,38 +14,30 @@ export class AccountService {
   public user:Observable<User>
   loading = false;
 
-  constructor
-  (private router: Router, private http: HttpClient)
-  {
-    this.userSubject = new BehaviorSubject<User>
-    (
-      JSON.parse(localStorage.getItem('current-user') || '{}')
-    );
-
+  constructor(private router: Router, private http: HttpClient) {
+    this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('current-user') || '{}'));
     this.user = this.userSubject.asObservable();
   }
 
-  public get userValue():User | null
-  {
+  public get userValue(): User | null {
     return localStorage.getItem('current-user') ? this.userSubject.value : null;
   }
 
-  login(form:any)
-  {
+  login(form: any) {
     return this.http.post<User>(
       `${environment.apiUrl}/users/authenticate`,
-      {username:form.username, password:form.password})
-        .subscribe(
-          user => {
-            localStorage.setItem('current-user', JSON.stringify(user));
-            this.userSubject.next(user);
-          if(user){
+      {username: form.username, password: form.password})
+      .subscribe(
+        user => {
+          localStorage.setItem('current-user', JSON.stringify(user));
+          this.userSubject.next(user);
+          if (user) {
             this.router.navigateByUrl('/home')
           }
           return user;
-          },
-          error => {
-           alert(error.error.message)
+        },
+        error => {
+          alert(error.error.message)
         })
   }
 
@@ -56,50 +48,39 @@ export class AccountService {
     this.router.navigate(['account/login']);
   }
 
-  register(user: User)
-  {
+  register(user: User) {
     return this.http.post(`${environment.apiUrl}/users/register`, user)
-    .subscribe(user => {
-      this.loading = false;
-      this.router.navigate(['home'])
-    })
+      .subscribe(() => {
+        this.loading = false;
+        this.router.navigate(['home'])
+      })
 
   }
 
-  getUsers()
-  {
-    return this.http.get<User []>(`${environment.apiUrl}/users`);
-  }
-
-  getUserById(id:string)
-  {
+  getUserById(id: string) {
     return this.http.get<User>(`${environment.apiUrl}/users/${id}`);
   }
 
-  update(id: string, params: any)
-  {
-    return this.http.put(`${environment.apiUrl}/users/${id}`,params)
-      .pipe(map(x =>
-        {
-          if(id == this.userValue?.id)
-          { // update local storage
-            const user = { ...this.userValue, ...params};
-            localStorage.setItem('user', JSON.stringify(user));
+  update(id: string, params: any) {
+    return this.http.put(`${environment.apiUrl}/users/${id}`, params)
+      .pipe(map(x => {
+        if (id == this.userValue?.id) { // update local storage
+          const user = {...this.userValue, ...params};
+          localStorage.setItem('current-user', JSON.stringify(user));
 
-            this.userSubject.next(user);   //publish  updated user to subscribers
-          }
-          return x
-        }));
+          this.userSubject.next(user);   //publish  updated user to subscribers
+        }
+        return x
+      }));
   }
 
-  delete(id:string)
-  {
+  delete(id: string) {
     return this.http.delete(`${environment.apiUrl}/users/${id}`)
-      .pipe(map(x =>
-        {  // automatic logout if user try entryce to deleted user
-          if(id == this.userValue?.id)
-          { this.logout();}
-          return x;
-        }))
+      .pipe(map(x => {  // automatic logout if user try entryce to deleted user
+        if (id == this.userValue?.id) {
+          this.logout();
+        }
+        return x;
+      }))
   }
 }

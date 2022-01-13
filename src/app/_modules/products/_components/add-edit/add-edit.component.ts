@@ -31,6 +31,7 @@ export class AddEditComponent implements OnInit {
   myForm = new FormGroup({
     customerId:new FormControl(''),
     userId:new FormControl(JSON.parse(localStorage.getItem('current-user') || '')?.id || null),
+    userName:new FormControl(JSON.parse(localStorage.getItem('current-user') || '')?.firstName || null),
     id: new FormControl(''),
     title: new FormControl('', [Validators.required, Validators.minLength(3)]),
     description: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -65,7 +66,7 @@ export class AddEditComponent implements OnInit {
   }
 
   submit() {
-    this.productService.addNewProduct(this.myForm.value);
+    this.productService.addOrEditProduct(this.myForm.value);
   }
 
   clear() {
