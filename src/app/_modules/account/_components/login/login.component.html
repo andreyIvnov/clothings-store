@@ -1,9 +1,9 @@
-<div class="card">
+<!-- <div class="card">
     <h4 class="card-header">Login</h4>
     <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-            <!-- USERNAME -->
+            USERNAME
             <div>
                 <mat-form-field appearance="fill">
                     <mat-label>Enter your username</mat-label>
@@ -11,7 +11,7 @@
                 </mat-form-field>
             </div>
 
-            <!-- PASSWORD -->
+            PASSWORD
             <div>
                 <mat-form-field appearance="fill">
                     <mat-label>Enter your password</mat-label>
@@ -30,4 +30,27 @@
             </div>
         </form>
     </div>
-</div>
+</div> -->
+
+
+
+<form class="form-3" [formGroup]="form" (ngSubmit)="onSubmit()">
+    
+    <p class="clearfix">
+        <label for="login">Username</label>
+        <input type="text" placeholder="Username" formControlName="username" required>
+    </p>
+    
+    <p class="clearfix">
+        <label for="password">Password</label>
+        <input type="password" formControlName="password" placeholder="Password" required> 
+    </p>
+    
+    <p class="clearfix">
+        <a routerLink="../register" class="btn btn-link">Register</a>
+    </p>
+    
+    <p class="clearfix">
+        <input type="submit" [disabled]="loading" value="Login">
+    </p>       
+  </form>
